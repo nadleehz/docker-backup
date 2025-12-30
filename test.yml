@@ -1,0 +1,29 @@
+name: "test"
+
+working-dir: /tmp
+env:
+  BACK_BASE_DIR: /tmp/backup
+
+jobs:
+  os-info:
+    steps:
+      - name: env
+        run: printenv
+      - name: docker-backup-test
+        uses: docker-backup@latest
+        plugin-path: ${WORKFLOW_DIR}
+        with:
+          base_backup_dir: /tmp/postgres
+          docker_cfg: |
+            #all_containers: true # then the following configs only filter volumes
+            #docker_host: unix:///var/run/docker.sock  # optional
+            containers:
+              - name: infisical-db
+                commands:
+                  - outputFile: /tmp/postgres/pg_dump.sql
+                    #containerUser: root  # optional
+                    cmds:
+                      - pg_dumpall
+                      - -U
+                      - infisical
+                      - -c
